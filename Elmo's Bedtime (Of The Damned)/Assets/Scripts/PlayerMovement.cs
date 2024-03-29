@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
     public Transform groundCheck;
     public float groundDistance = 0.4f;
     public LayerMask layerGround;
-    bool isGrounded;
+    public bool isGrounded;
 
     public Transform orientation;
     float horizontalInput;
@@ -42,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
     {
         // Check if grounded
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, layerGround);
+        
 
         MyInput();
         SpeedControl();
