@@ -4,53 +4,60 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-
-    [Header("Movement")]
-    public float moveSpeed;
-    public float groundDrag;
-    public float jumpForce;
-    public float jumpCooldown;
-    public float airMultiplier;
-    bool jumpReady;
-
-    [Header("Keybinds")]
-    public KeyCode jumpKey = KeyCode.Space;
-
-    [Header("Ground Check")]
-    public Transform groundCheck;
-    public float groundDistance = 0.4f;
-    public LayerMask layerGround;
-    public bool isGrounded;
-
-    public Transform orientation;
-    float horizontalInput;
-    float verticalInput;
-
-    Vector3 moveDirection;
+    // !!!!VARIABLES!!!!
 
     Rigidbody rb;
 
+    [Header("Basic Movement")]
+    // Movement + Player Configuration
+    public float pf_moveSpd;
+    public float pf_drag;
+    public Transform pt_orientation;
+    float f_horizontalInput;
+    float f_verticalInput;
+    Vector3 v3_moveDirection;
+
+    [Header("Jumping")]
+    public float pf_jumpForce;
+    public float pf_jumpCooldown;
+    public float pf_airMultiplier;
+    bool b_jumpReady;
+
+    [Header("Ground Check")]
+    public Transform pT_groundCheck;
+    public float pf_groundDistance = 0.4f;
+    public LayerMask pLM_groundLayer;
+    public bool pb_isGrounded;
+
+    //KeyBinds
+    KeyCode inp_jumpKey = KeyCode.Space;
+
+    // !!!!START COMPONENT!!!!
+
     private void Start()
     {
-        jumpReady = true;
+        // Set player ready to jump.
+        b_jumpReady = true;
+
+        // Configure player rigid body
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
     }
 
-    // Update is called once per frame
+    // !!!!UPDATE COMPONENT!!!!
     void Update()
     {
-        // Check if grounded
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, layerGround);
-        
-
-        MyInput();
+        // Obtain constants 
+        MyInput(); // Keyboard Inputs
         SpeedControl();
 
-        //Drag
-        if (isGrounded)
+        // Check if player is on the ground
+        pb_isGrounded = Physics.CheckSphere(pT_groundCheck.position, pf_groundDistance, pLM_groundLayer);
+        
+        // Apply player drag physics
+        if (pb_isGrounded)
         {
-            rb.drag = groundDrag;
+            rb.drag = pf_drag;
         }
         else
         {
@@ -65,30 +72,32 @@ public class PlayerMovement : MonoBehaviour
 
     private void MyInput()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
-
-        if(Input.GetKey(jumpKey) && jumpReady && isGrounded)
+        // Move Keys 
+        f_horizontalInput = Input.GetAxisRaw("Horizontal");
+        f_verticalInput = Input.GetAxisRaw("Vertical");
+        
+        // Jump
+        if(Input.GetKey(inp_jumpKey) && b_jumpReady && pb_isGrounded)
         {
-            jumpReady = false;
+            b_jumpReady = false;
             Jump();
-            Invoke(nameof(ResetJump), jumpCooldown);
+            Invoke(nameof(ResetJump), pf_jumpCooldown);
         }
     }
 
     private void MovePlayer()
     {
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+        v3_moveDirection = pt_orientation.forward * f_verticalInput + pt_orientation.right * f_horizontalInput;
 
         // on Ground
-        if(isGrounded)
+        if(pb_isGrounded)
         {
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+            rb.AddForce(v3_moveDirection.normalized * pf_moveSpd * 10f, ForceMode.Force);
         }
         // on Air
-        else if(!isGrounded)
+        else if(!pb_isGrounded)
         {
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
+            rb.AddForce(v3_moveDirection.normalized * pf_moveSpd * 10f * pf_airMultiplier, ForceMode.Force);
         }
     }
 
@@ -97,9 +106,9 @@ public class PlayerMovement : MonoBehaviour
         Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
         // Limit velocity if needed
-        if(flatVel.magnitude > moveSpeed)
+        if(flatVel.magnitude > pf_moveSpd)
         {
-            Vector3 limitedVel = flatVel.normalized * moveSpeed;
+            Vector3 limitedVel = flatVel.normalized * pf_moveSpd;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
     }
@@ -108,11 +117,11 @@ public class PlayerMovement : MonoBehaviour
     {
         // reset y velocity
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        rb.AddForce(transform.up * pf_jumpForce, ForceMode.Impulse);
     }
 
     private void ResetJump()
     {
-        jumpReady = true;
+        b_jumpReady = true;
     }
 }
