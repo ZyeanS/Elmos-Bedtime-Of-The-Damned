@@ -44,7 +44,7 @@ public class ClimbingMechanics : MonoBehaviour
     void StateMachine()
     {
         // Climbing
-        if(b_frontWall && f_verticalInput != 0)
+        if(Input.GetKey("space") && b_frontWall && f_verticalInput != 0)
         {
             if (!b_isClimbing) StartClimbing();
 
