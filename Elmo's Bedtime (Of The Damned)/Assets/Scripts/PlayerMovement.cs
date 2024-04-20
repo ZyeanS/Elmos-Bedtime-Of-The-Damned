@@ -47,8 +47,18 @@ public class PlayerMovement : MonoBehaviour
         MyInput();
         SpeedControl();
 
+<<<<<<< Updated upstream
         //Drag
         if (isGrounded)
+=======
+        Debug.Log(rb.velocity.magnitude);
+
+        // Check if player is on the ground
+        pb_isGrounded = Physics.CheckSphere(pT_groundCheck.position, pf_groundDistance, pLM_groundLayer);
+        
+        // Apply player drag physics
+        if (pb_isGrounded)
+>>>>>>> Stashed changes
         {
             rb.drag = groundDrag;
         }
